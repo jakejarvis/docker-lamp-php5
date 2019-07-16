@@ -25,9 +25,29 @@ RUN add-apt-repository -y ppa:ondrej/php && \
     add-apt-repository -y ppa:ondrej/php5-compat && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4F4EA0AAE5267A6C && \
     apt-get update && \
-    apt-get -y dist-upgrade && \
-    apt-get -y install supervisor wget curl git zip unzip pwgen apache2 mysql-server-5.7 php5.6 libapache2-mod-php5.6 php5.6-mysql php5.6-mcrypt php5.6-gd php5.6-xml php5.6-mbstring php5.6-gettext php5.6-zip php5.6-curl && \
-    apt-get -y autoremove
+    apt-get -y upgrade && \
+    apt-get -y --no-install-recommends install \
+        supervisor \
+        wget \
+        curl \
+        git \
+        zip \
+        unzip \
+        pwgen \
+        apache2 \
+        mysql-server-5.7 \
+        php5.6 \
+        libapache2-mod-php5.6 \
+        php5.6-mysql \
+        php5.6-mcrypt \
+        php5.6-gd \
+        php5.6-xml \
+        php5.6-mbstring \
+        php5.6-gettext \
+        php5.6-zip \
+        php5.6-curl && \
+    apt-get -y autoremove && \
+    rm -rf /var/lib/apt/lists/*
 
 # Point CLI to use PHP 5.6
 RUN ln -sfn /usr/bin/php5.6 /etc/alternatives/php
@@ -39,7 +59,7 @@ ADD config/create_mysql_users.sh /create_mysql_users.sh
 ADD config/run.sh /run.sh
 RUN chmod 755 /*.sh
 
-# Add better default configurations
+# Add sensible default configurations
 ADD config/supervisord-apache2.conf /etc/supervisor/conf.d/supervisord-apache2.conf
 ADD config/supervisord-mysqld.conf /etc/supervisor/conf.d/supervisord-mysqld.conf
 ADD config/mysqld_innodb.cnf /etc/mysql/conf.d/mysqld_innodb.cnf
@@ -68,9 +88,6 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
     php composer-setup.php && \
     php -r "unlink('composer-setup.php');" && \
     mv composer.phar /usr/local/bin/composer
-
-# Set "secure" MySQL admin password
-ENV MYSQL_PASS:-$(pwgen -s 12 1)
 
 # Enable mod_rewrite
 RUN a2enmod rewrite
