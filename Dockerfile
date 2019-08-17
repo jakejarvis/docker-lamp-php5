@@ -1,4 +1,4 @@
-FROM phusion/baseimage:0.10.2
+FROM phusion/baseimage:0.11
 MAINTAINER Jake Jarvis <jake@jarv.is>
 ENV REFRESHED_AT 2019-06-11
 
